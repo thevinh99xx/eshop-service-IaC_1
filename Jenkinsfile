@@ -20,11 +20,11 @@ pipeline {
       steps {
         container(name: 'terraform') {
           withCredentials(bindings: [[
-                                                $class: 'AmazonWebServicesCredentialsBinding',
-                                                credentialsId: 'awsCredentials',
-                                                accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                                                secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-                                                ]]) {
+                                                            $class: 'AmazonWebServicesCredentialsBinding',
+                                                            credentialsId: 'awsCredentials',
+                                                            accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                                                            secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                                                            ]]) {
               sh 'terraform init'
             }
 
@@ -37,11 +37,11 @@ pipeline {
         steps {
           container(name: 'terraform') {
             withCredentials(bindings: [[
-                                                    $class: 'AmazonWebServicesCredentialsBinding',
-                                                    credentialsId: 'awsCredentials',
-                                                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                                                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-                                                    ]]) {
+                                                                  $class: 'AmazonWebServicesCredentialsBinding',
+                                                                  credentialsId: 'awsCredentials',
+                                                                  accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                                                                  secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                                                                  ]]) {
                 sh 'terraform plan -out tfplan'
                 sh 'terraform show -no-color tfplan > tfplan.txt'
               }
@@ -72,11 +72,11 @@ pipeline {
           steps {
             container(name: 'terraform') {
               withCredentials(bindings: [[
-                                                        $class: 'AmazonWebServicesCredentialsBinding',
-                                                        credentialsId: 'awsCredentials',
-                                                        accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                                                        secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-                                                        ]]) {
+                                                                        $class: 'AmazonWebServicesCredentialsBinding',
+                                                                        credentialsId: 'awsCredentials',
+                                                                        accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                                                                        secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                                                                        ]]) {
                   sh 'echo test'
                   sh 'terraform apply -auto-approve'
                 }
