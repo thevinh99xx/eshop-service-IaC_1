@@ -1,7 +1,7 @@
 pipeline {
-    agent {
-        kubernetes {
-            yaml '''
+  agent {
+    kubernetes {
+      yaml '''
               apiVersion: v1
               kind: Pod
               spec:
@@ -12,76 +12,79 @@ pipeline {
                   - cat
                   tty: true
             '''
-        }
     }
 
-    stages {
-        stage('terraform init'){
-            steps{
-                container('terraform'){
-                    withCredentials([[
-                        $class: 'AmazonWebServicesCredentialsBinding',
-                        credentialsId: 'awsCredentials',
-                        accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                        secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-                        ]]) {
-                              sh 'terraform init'
-                    }
-                }
+  }
+  stages {
+    stage('terraform init') {
+      steps {
+        container(name: 'terraform') {
+          withCredentials(bindings: [[
+                                    $class: 'AmazonWebServicesCredentialsBinding',
+                                    credentialsId: 'awsCredentials',
+                                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                                    ]]) {
+              sh 'terraform init'
             }
+
+          }
+
         }
-        stage('terraform plan'){
-            steps{
-                container('terraform'){
-                    withCredentials([[
-                        $class: 'AmazonWebServicesCredentialsBinding',
-                        credentialsId: 'awsCredentials',
-                        accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                        secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-                        ]]) {
-                              sh 'terraform plan -out tfplan'
-                              sh 'terraform show -no-color tfplan > tfplan.txt'
-                    }
-                }
+      }
+
+      stage('terraform plan') {
+        steps {
+          container(name: 'terraform') {
+            withCredentials(bindings: [[
+                                      $class: 'AmazonWebServicesCredentialsBinding',
+                                      credentialsId: 'awsCredentials',
+                                      accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                                      secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                                      ]]) {
+                sh 'terraform plan -out tfplan'
+                sh 'terraform show -no-color tfplan > tfplan.txt'
+              }
+
             }
+
+          }
         }
+
         stage('Approval') {
-            when {
-                branch 'main'
+          when {
+            branch 'main'
+          }
+          steps {
+            script {
+              def plan = readFile 'tfplan.txt'
+              input message: "Do you want to apply the plan?",
+              parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
             }
-            steps {
-                script {
-                    def plan = readFile 'tfplan.txt'
-                    input message: "Do you want to apply the plan?",
-                        parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
-                }
-            }
+
+          }
         }
-        stage('terraform apply'){
-           when {
-                branch 'main'
-            }
-            steps{
-                container('terraform'){
-                    withCredentials([[
-                        $class: 'AmazonWebServicesCredentialsBinding',
-                        credentialsId: 'awsCredentials',
-                        accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                        secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-                        ]]) {
-                              sh 'echo test'
-                              sh 'terraform apply -auto-approve'
-                    }
+
+        stage('terraform apply') {
+          when {
+            branch 'main'
+          }
+          steps {
+            container(name: 'terraform') {
+              withCredentials(bindings: [[
+                                        $class: 'AmazonWebServicesCredentialsBinding',
+                                        credentialsId: 'awsCredentials',
+                                        accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                                        secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                                        ]]) {
+                  sh 'echo test'
+                  sh 'terraform apply -auto-approve'
                 }
+
+              }
+
             }
-            // post {
-            //     success { 
-            //         slackSend(channel: '<< CHANNEL ID >>', color: 'good', message: 'service IaC Pipeline apply Success')
-            //     }
-            //     failure {
-            //         slackSend(channel: '<< CHANNEL ID >>', color: 'danger', message: 'service IaC Pipeline apply fail')
-            //     }
-            // }
+          }
+
         }
-    }
-}
+      }
