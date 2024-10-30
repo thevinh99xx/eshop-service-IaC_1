@@ -1,9 +1,8 @@
-## Define Common variables #################################
 
 variable "aws_region" {
   default     = null 
   type        = string
-  description = "AWS region"
+  description = "us-west-1"
 }
 
 
@@ -46,7 +45,7 @@ variable "node_min_size" {
 
 variable "mgmt_nat_gw_ip" {
   type        = string
-  description = "MGMT VPC Nat Gateway Public IP"
+  description = "18.205.16.97"
 }
 
 variable "sg_rules" {
