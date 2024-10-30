@@ -22,8 +22,8 @@ pipeline {
                     withCredentials([[
                         $class: 'AmazonWebServicesCredentialsBinding',
                         credentialsId: 'awsCredentials',
-                        accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                        secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                        accessKeyVariable: 'AKIARMPMV3PTBKR4EOJB',
+                        secretKeyVariable: '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'
                         ]]) {
                               sh 'terraform init'
                     }
@@ -36,8 +36,8 @@ pipeline {
                     withCredentials([[
                         $class: 'AmazonWebServicesCredentialsBinding',
                         credentialsId: 'awsCredentials',
-                        accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                        secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                        accessKeyVariable: 'AKIARMPMV3PTBKR4EOJB',
+                        secretKeyVariable: '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'
                         ]]) {
                               sh 'terraform plan -destroy -out tfplan'
                               sh 'terraform show -no-color tfplan > tfplan.txt'
@@ -66,22 +66,22 @@ pipeline {
                     withCredentials([[
                         $class: 'AmazonWebServicesCredentialsBinding',
                         credentialsId: 'awsCredentials',
-                        accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                        secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                        accessKeyVariable: 'AKIARMPMV3PTBKR4EOJB',
+                        secretKeyVariable: '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'
                         ]]) {
                               sh 'echo test'
                               sh 'terraform destroy -auto-approve'
                     }
                 }
             }
-            // post {
-            //     success { 
-            //         slackSend(channel: '<< CHANNEL ID >>', color: 'good', message: 'service IaC Pipeline Destroy Success')
-            //     }
-            //     failure {
-            //         slackSend(channel: '<< CHANNEL ID >>', color: 'danger', message: 'service IaC Pipeline Destroy fail')
-            //     }
-            // }
+             post {
+                 success { 
+                     slackSend(channel: 'C07RNC9DDBN', color: 'good', message: 'service IaC Pipeline Destroy Success')
+                 }
+                 failure {
+                     slackSend(channel: 'C07RNC9DDBN', color: 'danger', message: 'service IaC Pipeline Destroy fail')
+                 }
+             }
         }
     }
 }
